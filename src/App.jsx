@@ -10,7 +10,6 @@ function App() {
   const [count, setCount] = useState(0);
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  // const [totalItemsOnLastPage, settotalItemsOnLastPage] = useState(0);
   const [selectedGenre, setSelectedGenre] = useState("");
   const [isSearchComplete, setIsSearchComplete] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -43,10 +42,6 @@ function App() {
     { value: "Western", label: "Western" },
   ];
 
-
-  const totalItemsOnLastPage =
-  currentPage === totalPages ? movies.length : 25;
-
   useEffect(() => {
     async function fetchAuthToken() {
       let response = await axios.get(
@@ -58,134 +53,119 @@ function App() {
   }, []);
 
   useEffect(() => {
-    async function fetchAllMovies() {
-      setLoading(true);
-      try {
-        let response = await axios.get(
-          `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?page=${currentPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
+    if (token) {
+      async function fetchAllMovies() {
+        setLoading(true);
+        try {
+          let response = await axios.get(
+            `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?page=${currentPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          },
-        );
-        setMovies(response.data.data);
-        setTotalPages(response.data.totalPages);
-        setCount(response.data.data.length);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error:", error);
-        setLoading(false);
+          );
+          setMovies(response.data.data);
+          setTotalPages(response.data.totalPages);
+          setCount(response.data.data.length);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error:", error);
+          setLoading(false);
+        }
       }
+      fetchAllMovies();
     }
-    fetchAllMovies();
-  }, [currentPage]);
+  }, [token, currentPage]);
 
   useEffect(() => {
-  const totalResults = async () => {
-    try {
-      let itemsOnLastPage = 0;
+    if (token) {
+      const totalResults = async () => {
+        try {
+          let itemsOnLastPage = 0;
 
-      if (totalPages > 0) {
-        const response = await axios.get(
-          `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?page=${totalPages}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
+          if (totalPages > 0) {
+            const response = await axios.get(
+              `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?page=${totalPages}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+            );
 
-        itemsOnLastPage = response.data.data.length;
+            itemsOnLastPage = response.data.data.length;
 
-        setTotalResults((totalPages - 1) * 25 + itemsOnLastPage);
-      } else {
-        setTotalResults(0);
-      }
-    } catch (error) {
-      console.error(error);
+            setTotalResults((totalPages - 1) * 25 + itemsOnLastPage);
+          } else {
+            setTotalResults(0);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      totalResults();
     }
+  }, [token, totalPages]);
+
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
   };
-  totalResults();
-}, [totalPages]);
-
-    
-
-  // useEffect(() => {
-  //   async function itemsOnLastPage() {
-  //     try {
-  //       let response = await axios.get(
-  //         `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?page=${totalPages}`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //         },
-  //       );
-  //       settotalItemsOnLastPage(response?.data?.data?.length);
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-  //   itemsOnLastPage();
-  // }, [totalPages]);
-
-   const handleSearchChange = (e) => {
-    setQuery(e.target.value)
-  }
 
   useEffect(() => {
-    const fetchSearchedMovies = async () => {
-    setLoading(true);
-    try {      
-      let response = await axios.get(
-        `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?search=${query}&page=${currentPage}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      setTotalPages(response.data.totalPages);
-      setCount(response.data.data.length);
-      setMovies(response.data.data);
-      setIsSearchComplete(query === "");
-      setLoading(false);
-    } catch (error) {
-      console.error("Error:", error);
-      setLoading(false);
+    if (token) {
+      const fetchSearchedMovies = async () => {
+        setLoading(true);
+        try {
+          let response = await axios.get(
+            `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?search=${query}&page=${currentPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          setTotalPages(response.data.totalPages);
+          setCount(response.data.data.length);
+          setMovies(response.data.data);
+          setIsSearchComplete(query === "");
+          setLoading(false);
+        } catch (error) {
+          console.error("Error:", error);
+          setLoading(false);
+        }
+      };
+      fetchSearchedMovies();
     }
-  }
-    fetchSearchedMovies()
-  },[currentPage, query, token])
+  }, [currentPage, query, token]);
 
   const handleChange = async (e) => {
     setSelectedGenre(e.target.value);
   };
 
   useEffect(() => {
-    const getGenre = async () => {
-      setLoading(true);
-      try {
-        let response = await axios.get(
-          `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?&search=${query}&genre=${selectedGenre}&page=${currentPage}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
+    if (token) {
+      const getGenre = async () => {
+        setLoading(true);
+        try {
+          let response = await axios.get(
+            `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?&search=${query}&genre=${selectedGenre}&page=${currentPage}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          },
-        );
-        setMovies(response.data.data);
-        setCount(response.data.data.length);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error:", error);
-        setLoading(false);
-      }
-    };
-    getGenre();
+          );
+          setMovies(response.data.data);
+          setCount(response.data.data.length);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error:", error);
+          setLoading(false);
+        }
+      };
+      getGenre();
+    }
   }, [selectedGenre, currentPage, query, token]);
 
   return (
@@ -217,7 +197,6 @@ function App() {
           movies={movies}
           totalPages={totalPages}
           count={count}
-          totalItemsOnLastPage={totalItemsOnLastPage}
           loading={loading}
           token={token}
           totalResults={totalResults}
@@ -226,26 +205,25 @@ function App() {
       {totalPages === 0 ? (
         <div></div>
       ) : (
-<div>
-        <button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-        >
-          Previous
-        </button>
-        <span>
-          {" "}
-          Page {currentPage} of {totalPages}{" "}
-        </span>
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
+        <div>
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+          >
+            Previous
+          </button>
+          <span>
+            {" "}
+            Page {currentPage} of {totalPages}{" "}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+          >
+            Next
+          </button>
+        </div>
       )}
-      
     </div>
   );
 }
