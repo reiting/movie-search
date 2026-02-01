@@ -1,0 +1,5 @@
+Give more time, I would add a feature to allow users to skip to whatever page they wanted (like a drop down box where they can choose any of the pages they want to go right to). I would also probably go through and add instructions and explanations to the screens so people know, for example, that they cannot search by genre unless they search for something first.
+
+One thing that I was particularly proud of was getting the conditional logic throughout. I really love ternaries, but they can be super confusing at times too, so it was nice to figure it out!
+
+I think most interesting was what the api calls did not give us. I may have missed it, but for example, I never saw where they gave a number of all the items total! Learning to work around that to get the info you do  need is always a challenge, but it's really really satisfying to get it right!
