@@ -1,16 +1,23 @@
 import SingleMovie from "./SingleMovie";
 import LoadingSpinner from "./LoadingSpinner";
 
-export const Movies = ({ movies, totalResults, token, loading }) => {
+export const Movies = ({
+  movies,
+  totalResults,
+  token,
+  loading,
+  count,
+  totalPages,
+}) => {
   return (
     <>
       <header className="movies__header">
         {loading ? (
           <LoadingSpinner />
-        ) : Number.isNaN(totalResults) ? null : totalResults > 0 ? (
-          <h1>Total results: {totalResults}</h1>
+        ) : Number.isNaN(totalResults) ? null : totalPages === 1 ? (
+          <h1>Total results: {count}</h1>
         ) : (
-          <h1>No matches found!</h1>
+          <h1>Total Results: {totalResults}</h1>
         )}
       </header>
 

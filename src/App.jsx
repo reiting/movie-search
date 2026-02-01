@@ -65,6 +65,7 @@ function App() {
               },
             },
           );
+
           setMovies(response.data.data);
           setTotalPages(response.data.totalPages);
           setCount(response.data.data.length);
@@ -80,10 +81,9 @@ function App() {
 
   useEffect(() => {
     if (token) {
-      const totalResults = async () => {
+      const fetchtotalResults = async () => {
         try {
           let itemsOnLastPage = 0;
-
           if (totalPages > 0) {
             const response = await axios.get(
               `https://0kadddxyh3.execute-api.us-east-1.amazonaws.com/movies?page=${totalPages}`,
@@ -93,10 +93,8 @@ function App() {
                 },
               },
             );
-
             itemsOnLastPage = response.data.data.length;
-
-            setTotalResults((totalPages - 1) * 25 + itemsOnLastPage);
+            setTotalResults((totalPages - 1) * count + itemsOnLastPage);
           } else {
             setTotalResults(0);
           }
@@ -104,9 +102,9 @@ function App() {
           console.error(error);
         }
       };
-      totalResults();
+      fetchtotalResults();
     }
-  }, [token, totalPages]);
+  }, [token, totalPages, count]);
 
   const handleSearchChange = (e) => {
     setQuery(e.target.value);
